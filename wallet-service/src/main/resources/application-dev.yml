@@ -1,0 +1,64 @@
+# ===========================================
+# DEVELOPMENT PROFILE CONFIGURATION
+# ===========================================
+
+# Use H2 In-Memory Database for Development
+spring:
+  datasource:
+    url: jdbc:h2:mem:walletdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  # H2 Console (for debugging)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+
+  # JPA for H2 - Let Hibernate create tables
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+    show-sql: true
+
+  # Disable SQL script initialization (use Hibernate instead)
+  sql:
+    init:
+      mode: never
+
+  # Disable Kafka, Redis, and OAuth2 for local testing
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration
+
+  kafka:
+    enabled: false
+
+  redis:
+    enabled: false
+
+# Payment Gateway Configuration (Dummy values for dev)
+payment:
+  stripe:
+    api-key: sk_test_dummy_key_for_development
+  paypal:
+    client-id: dummy_paypal_client_id
+    client-secret: dummy_paypal_client_secret
+    mode: sandbox
+
+# Enhanced Logging for Development
+logging:
+  level:
+    root: INFO
+    com.wallet.service.wallet: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG

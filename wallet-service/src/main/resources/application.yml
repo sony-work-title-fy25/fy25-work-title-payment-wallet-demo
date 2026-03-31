@@ -1,0 +1,189 @@
+# ===========================================
+# WALLET SERVICE - APPLICATION CONFIGURATION
+# ===========================================
+
+# Server Configuration
+server:
+  port: 8083
+  servlet:
+    context-path: /
+
+# Application Name
+spring:
+  application:
+    name: wallet-service
+
+  # ===========================================
+  # DATABASE CONFIGURATION (PostgreSQL)
+  # ===========================================
+  datasource:
+    url: jdbc:postgresql://localhost:5432/walletdb
+    username: ${DB_USERNAME:wallet_user}
+    password: ${DB_PASSWORD:wallet_pass}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+      max-lifetime: 1200000
+
+  # ===========================================
+  # JPA / HIBERNATE CONFIGURATION
+  # ===========================================
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+
+  # ===========================================
+  # KAFKA CONFIGURATION
+  # ===========================================
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
+    consumer:
+      group-id: wallet-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.wallet.service.wallet.event
+
+  # ===========================================
+  # REDIS CONFIGURATION
+  # ===========================================
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
+
+  # ===========================================
+  # SECURITY / OAUTH2 CONFIGURATION
+  # ===========================================
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI:http://localhost:8080/auth/realms/wallet}
+          jwk-set-uri: ${JWT_JWK_SET_URI:http://localhost:8080/auth/realms/wallet/protocol/openid-connect/certs}
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:your-256-bit-secret-key-change-this-in-production}
+  expiration: 86400000
+
+# ===========================================
+# PAYMENT GATEWAY CONFIGURATION
+# ===========================================
+payment:
+  stripe:
+    api-key: ${STRIPE_API_KEY:sk_test_your_stripe_api_key}
+    webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_your_webhook_secret}
+  paypal:
+    client-id: ${PAYPAL_CLIENT_ID:your_paypal_client_id}
+    client-secret: ${PAYPAL_CLIENT_SECRET:your_paypal_client_secret}
+    mode: ${PAYPAL_MODE:sandbox}
+
+# ===========================================
+# KAFKA TOPICS
+# ===========================================
+kafka:
+  topics:
+    transaction-events: transaction-events
+    wallet-events: wallet-events
+    payment-events: payment-events
+
+# ===========================================
+# WALLET CONFIGURATION
+# ===========================================
+wallet:
+  transaction:
+    max-amount: 100000.00
+    min-amount: 0.01
+  transfer:
+    daily-limit: 50000.00
+  cache:
+    ttl: 300
+
+# ===========================================
+# ACTUATOR / MONITORING
+# ===========================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+  tracing:
+    sampling:
+      probability: 1.0
+
+# ===========================================
+# OPENAPI / SWAGGER CONFIGURATION
+# ===========================================
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+
+# ===========================================
+# EUREKA CLIENT CONFIGURATION
+# ===========================================
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+# ===========================================
+# LOGGING CONFIGURATION
+# ===========================================
+logging:
+  level:
+    root: INFO
+    com.wallet.service.wallet: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
