@@ -23,7 +23,7 @@ The Wallet Service provides secure digital wallet operations including deposits,
 ## Tech Stack
 
 - **Framework**: Spring Boot 3.5.x
-- **Java Version**: Java 17
+- **Java Version**: Java 21
 - **Database**: PostgreSQL (Production), H2 (Development)
 - **Cache**: Redis with Lettuce
 - **Message Queue**: Apache Kafka

@@ -1,5 +1,5 @@
 # Build stage
-FROM maven:3.9-eclipse-temurin-17 AS build
+FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
 # Copy parent POM and module POMs first for dependency caching
@@ -19,7 +19,7 @@ COPY wallet-service/src wallet-service/src
 RUN mvn clean package -pl wallet-service -am -DskipTests
 
 # Runtime stage
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:21-jre
 WORKDIR /app
 
 # Create non-root user
