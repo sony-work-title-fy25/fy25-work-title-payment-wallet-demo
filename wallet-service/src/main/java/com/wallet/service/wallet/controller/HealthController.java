@@ -11,17 +11,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/health")
+@RequestMapping("/api/v1/health")
 @Tag(name = "Health Check", description = "Service health monitoring endpoints")
 public class HealthController {
     
     @GetMapping
     @Operation(summary = "Health check", description = "Check if the wallet service is up and running")
-    public ResponseEntity<Map<String, String>> health() {
-        Map<String, String> response = new HashMap<>();
+    public ResponseEntity<Map<String, Object>> health() {
+        Map<String, Object> response = new HashMap<>();
         response.put("status", "UP");
         response.put("service", "wallet-service");
-        response.put("version", "1.0.0");
+        response.put("timestamp", java.time.LocalDateTime.now());
         return ResponseEntity.ok(response);
     }
 }

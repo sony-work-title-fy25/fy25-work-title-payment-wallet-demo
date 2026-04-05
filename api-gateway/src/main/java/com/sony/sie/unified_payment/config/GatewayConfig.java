@@ -70,11 +70,11 @@ public class GatewayConfig {
             Object role = servletRequest.getAttribute("X-User-Role");
             Object userId = servletRequest.getAttribute("X-User-Id");
 
-            if (email == null && role == null && userId == null) {
-                return request;
-            }
-
             ServerRequest.Builder builder = ServerRequest.from(request);
+
+            String authHeader = servletRequest.getHeader("Authorization");
+            if (authHeader != null) builder.header("Authorization", authHeader);
+
             if (email != null) builder.header("X-User-Email", email.toString());
             if (role != null) builder.header("X-User-Role", role.toString());
             if (userId != null) builder.header("X-User-Id", userId.toString());

@@ -26,11 +26,11 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
     show-sql: true
+    defer-datasource-initialization: true
 
-  # Disable SQL script initialization (use Hibernate instead)
   sql:
     init:
-      mode: never
+      mode: always
 
   # Disable Kafka, Redis, and OAuth2 for local testing
   autoconfigure:

@@ -14,6 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private static final String[] PUBLIC_ENDPOINTS = {
+            "/api/v1/health",
             "/api/v1/health/**",
             "/actuator/**",
             "/swagger-ui/**",
