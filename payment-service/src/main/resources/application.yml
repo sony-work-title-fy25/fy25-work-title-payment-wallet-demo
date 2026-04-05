@@ -68,41 +68,41 @@ spring:
           max-idle: 8
           min-idle: 2
 
-  management:
-    endpoints:
-      web:
-        exposure:
-          include: health,info,metrics,prometheus
-    endpoint:
-      health:
-        show-details: when_authorized
-    metrics:
-      tags:
-        application: ${spring.application.name}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+  metrics:
+    tags:
+      application: ${spring.application.name}
 
-  springdoc:
-    api-docs:
-      path: /api-docs
-    swagger-ui:
-      path: /swagger-ui.html
-      enabled: true
-      operations-sorter: method
-      tags-sorter: alpha
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
 
-  eureka:
-    client:
-      service-url:
-        defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
-      fetch-registry: true
-      register-with-eureka: true
-    instance:
-      prefer-ip-address: true
-      instance-id: ${spring.application.name}:${server.port}
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
 
-  stripe:
-    api:
-      key: ${STRIPE_API_KEY:sk_test_dummy}
-      webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_dummy}
+stripe:
+  api:
+    key: ${STRIPE_API_KEY:sk_test_dummy}
+    webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_dummy}
 
 # Shared secret for HS256 JWT validation (used by JwtDecoderConfig in non-dev profiles).
 # For local runs you can export JWT_SECRET to override.
