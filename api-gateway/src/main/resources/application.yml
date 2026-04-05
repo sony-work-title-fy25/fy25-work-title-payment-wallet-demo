@@ -9,12 +9,6 @@ jwt:
   secret: mySecretKey1234567890123456789012
   expiration: 86400000
 
-services:
-  payment-gateway:
-    url: ${PAYMENT_SERVICE_URL:lb://payment-service}
-  wallet-service:
-    url: ${WALLET_SERVICE_URL:lb://wallet-service}
-
 eureka:
   client:
     service-url:

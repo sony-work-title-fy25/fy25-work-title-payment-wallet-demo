@@ -24,8 +24,6 @@ services:
       - "8085:8085"
     environment:
       - EUREKA_URI=http://eureka-server:8761/eureka
-      - PAYMENT_SERVICE_URL=lb://payment-service
-      - WALLET_SERVICE_URL=lb://wallet-service
     depends_on:
       eureka-server:
         condition: service_healthy

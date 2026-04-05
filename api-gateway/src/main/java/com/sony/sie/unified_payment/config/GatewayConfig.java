@@ -1,9 +1,9 @@
 package com.sony.sie.unified_payment.config;
 
-import java.net.URI;
+import static org.springframework.cloud.gateway.server.mvc.filter.LoadBalancerFilterFunctions.lb;
+
 import java.util.function.Function;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.server.mvc.handler.GatewayRouterFunctions;
 import org.springframework.cloud.gateway.server.mvc.handler.HandlerFunctions;
 import org.springframework.context.annotation.Bean;
@@ -28,45 +28,39 @@ import jakarta.servlet.http.HttpServletRequest;
 @Configuration
 public class GatewayConfig {
 
-    @Value("${services.payment-gateway.url}")
-    private String paymentServiceUrl;
-
-    @Value("${services.wallet-service.url:lb://wallet-service}")
-    private String walletServiceUrl;
-
     @Bean
     public RouterFunction<ServerResponse> paymentServiceRoutes() {
-        URI serviceUri = URI.create(paymentServiceUrl);
-
         return GatewayRouterFunctions.route("payment-transactions")
-                .route(RequestPredicates.path("/api/v1/payments/**"), HandlerFunctions.http(serviceUri))
+                .route(RequestPredicates.path("/api/v1/payments/**"), HandlerFunctions.http())
+                .filter(lb("payment-service"))
                 .before(userContextHeaderRelay())
                 .build()
             .and(
                 GatewayRouterFunctions.route("payment-methods")
-                    .route(RequestPredicates.path("/api/v1/payment-methods/**"), HandlerFunctions.http(serviceUri))
+                    .route(RequestPredicates.path("/api/v1/payment-methods/**"), HandlerFunctions.http())
+                    .filter(lb("payment-service"))
                     .before(userContextHeaderRelay())
                     .build()
             ).and(
                 GatewayRouterFunctions.route("payment-health")
-                    .route(RequestPredicates.path("/api/v1/health/**"), HandlerFunctions.http(serviceUri))
+                    .route(RequestPredicates.path("/api/v1/health/**"), HandlerFunctions.http())
+                    .filter(lb("payment-service"))
                     .build()
             );
     }
 
     @Bean
     public RouterFunction<ServerResponse> walletServiceRoutes() {
-        URI serviceUri = URI.create(walletServiceUrl);
-
         return GatewayRouterFunctions.route("wallet-operations")
-                .route(RequestPredicates.path("/api/v1/wallet/**"), HandlerFunctions.http(serviceUri))
+                .route(RequestPredicates.path("/api/v1/wallet/**"), HandlerFunctions.http())
+                .filter(lb("wallet-service"))
                 .before(userContextHeaderRelay())
                 .build();
     }
 
     /**
-     * Creates a before-filter that relays user context headers (set by the
-     * JwtAuthenticationFilter as request attributes) to the downstream service.
+     * Relays user context headers (set by JwtAuthenticationFilter as request
+     * attributes) to the downstream service.
      */
     private Function<ServerRequest, ServerRequest> userContextHeaderRelay() {
         return request -> {
